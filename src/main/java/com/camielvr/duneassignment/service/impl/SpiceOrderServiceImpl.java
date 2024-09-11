@@ -14,6 +14,7 @@ import com.camielvr.duneassignment.service.SpiceOrderService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,9 +94,14 @@ public class SpiceOrderServiceImpl implements SpiceOrderService {
         return SpiceOrderDTO.builder()
                 .id(spiceOrder.getId())
                 .customerName(spiceOrder.getCustomerName())
-                .orderDate(spiceOrder.getOrderDate())
+                .orderDate(fromDateToString(spiceOrder.getOrderDate()))
                 .quantity(spiceOrder.getQuantity())
                 .build();
+    }
+
+    private String fromDateToString(LocalDateTime orderDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm");
+        return orderDate.format(formatter);
     }
 
     private SpiceOrder toSpiceOrder(final SpiceOrderRequest spiceOrderRequest) {

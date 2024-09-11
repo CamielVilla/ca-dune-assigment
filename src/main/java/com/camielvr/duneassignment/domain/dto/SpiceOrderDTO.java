@@ -13,5 +13,5 @@ public class SpiceOrderDTO {
     private Long id;
     private String customerName;
     private Integer quantity;
-    private LocalDateTime orderDate;
+    private String orderDate;
 }

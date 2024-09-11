@@ -57,7 +57,7 @@ class SpiceOrderServiceImplTest {
     }
 
     @Test
-    void orderSpice_shouldSuccceedWhenRequestIsCorrect() {
+    void orderSpice_shouldSucceedWhenRequestIsCorrect() {
         spiceOrderRequest = createSpiceOrderRequest("Customer1", 5);
 
         when(invoiceService.createInvoice(any())).thenReturn(invoice);
@@ -72,7 +72,7 @@ class SpiceOrderServiceImplTest {
         assertEquals("Spice", savedSpiceOrder.getDescription());
         assertEquals("Kg", savedSpiceOrder.getQuantityType());
         assertEquals(5, savedSpiceOrder.getQuantity());
-        assertEquals(1L, savedSpiceOrder.getInvoice().getId());
+        assertEquals(55L, savedSpiceOrder.getInvoice().getId());
     }
 
     @Test
@@ -114,6 +114,17 @@ class SpiceOrderServiceImplTest {
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getAllSpiceOrders_shouldFormatDateCorrectly() {
+        when(spiceOrderRepository.findAll()).thenReturn(List.of(spiceOrder));
+
+        var result = spiceOrderService.getAllSpiceOrders();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("15 juni 2024, 12:00", result.get(0).getOrderDate());
     }
 
     @Test

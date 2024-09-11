@@ -47,8 +47,9 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Quantity</th>
                 <th>Customer</th>
+                <th>Quantity</th>
+                <th>Order Date</th>
                 <th>Invoice</th>
             </tr>
         </thead>
@@ -87,13 +88,15 @@
                 .then(response => response.json())
                 .then(data => {
                     const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
-                    ordersTable.innerHTML = ''; // Clear existing rows
+                    ordersTable.innerHTML = '';
                     data.forEach(order => {
                         const row = ordersTable.insertRow();
                         row.insertCell(0).innerText = order.id;
-                        row.insertCell(1).innerText = order.quantity;
-                        row.insertCell(2).innerText = order.customerName;
-                        const invoiceCell = row.insertCell(3);
+                        row.insertCell(1).innerText = order.customerName;
+                        row.insertCell(2).innerText = order.quantity;
+                        row.insertCell(3).innerText = order.orderDate;
+
+                        const invoiceCell = row.insertCell(4);
                         const invoiceButton = document.createElement('button');
                         invoiceButton.innerText = 'Get Invoice';
                         invoiceButton.onclick = () => fetchInvoice(order.id);
@@ -128,8 +131,8 @@
             const formData = new FormData(event.target);
 
             const data = {
-                customerName: formData.get('customerName'), // Naam van de klant uit de dropdown
-                quantity: formData.get('quantity') // Aantal kilo's uit het inputveld
+                customerName: formData.get('customerName'),
+                quantity: formData.get('quantity')
             };
 
             fetch('/spices/orders', {
@@ -137,7 +140,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data) // Verstuur de gegevens als JSON
+                body: JSON.stringify(data)
             })
                 .then(response => {
                     if (response.status === 201) {

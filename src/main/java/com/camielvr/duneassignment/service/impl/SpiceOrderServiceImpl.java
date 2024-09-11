@@ -11,6 +11,8 @@ import com.camielvr.duneassignment.exception.ResourceNotFoundException;
 import com.camielvr.duneassignment.repository.SpiceOrderRepository;
 import com.camielvr.duneassignment.service.InvoiceService;
 import com.camielvr.duneassignment.service.SpiceOrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,9 @@ import java.util.Optional;
 
 @Service
 public class SpiceOrderServiceImpl implements SpiceOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpiceOrderServiceImpl.class);
+
     private final SpiceOrderRepository spiceOrderRepository;
     private final InvoiceService invoiceService;
     private final AppConfig appConfig;
@@ -32,6 +37,8 @@ public class SpiceOrderServiceImpl implements SpiceOrderService {
 
     @Override
     public void orderSpice(final SpiceOrderRequest spiceOrderRequest) {
+        logger.debug("Processing spice order for customer: {}", spiceOrderRequest.getCustomerName());
+
         final SpiceOrder spiceOrder = toSpiceOrder(spiceOrderRequest);
 
         final Invoice invoice = invoiceService.createInvoice(toInvoiceRequest(spiceOrder));
@@ -39,27 +46,39 @@ public class SpiceOrderServiceImpl implements SpiceOrderService {
         spiceOrder.setInvoice(invoice);
 
         spiceOrderRepository.save(spiceOrder);
+
+        logger.debug("Spice order successfully saved for customer: {}", spiceOrderRequest.getCustomerName());
     }
 
     @Override
     public InvoiceDTO getSpiceOrderInvoice(Long id) {
+        logger.debug("Retrieving invoice for spice order with ID: {}", id);
+
         final Optional<SpiceOrder> spiceOrder = spiceOrderRepository.findById(id);
 
         if (spiceOrder.isEmpty()) {
             throw new ResourceNotFoundException("spice order not found with id " + id);
         }
 
+        logger.debug("Successfully retrieved invoice for spice order ID: {}", id);
+
         return toInvoiceDTO(spiceOrder.get().getId(), spiceOrder.get().getInvoice());
     }
 
     @Override
     public List<SpiceOrderDTO> getAllSpiceOrders() {
+        logger.debug("Retrieving all spice orders");
+
         final List<SpiceOrder> spiceOrders = spiceOrderRepository.findAll();
+
+        logger.debug("Retrieved {} spice orders", spiceOrders.size());
+
         return spiceOrders.stream().map(this::toSpiceOrderDTO).toList();
     }
 
     @Override
     public List<String> getAllSpiceCustomers() {
+
         return appConfig.getCustomers();
     }
 

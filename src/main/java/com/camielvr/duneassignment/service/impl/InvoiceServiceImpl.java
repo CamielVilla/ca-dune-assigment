@@ -3,6 +3,8 @@ package com.camielvr.duneassignment.service.impl;
 import com.camielvr.duneassignment.domain.entities.Invoice;
 import com.camielvr.duneassignment.domain.requests.InvoiceRequest;
 import com.camielvr.duneassignment.service.InvoiceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -10,6 +12,7 @@ import java.math.BigDecimal;
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
 
+    private static final Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
     public InvoiceServiceImpl() {
     }
@@ -18,16 +21,24 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Invoice createInvoice(final InvoiceRequest invoiceRequest) {
         this.validateRequest(invoiceRequest);
 
+        logger.debug("Creating invoice for customer: {}", invoiceRequest.getCustomerName());
+
         final BigDecimal costWithoutTax = this.calculateCostWithoutTax(invoiceRequest.getQuantity(), invoiceRequest.getPricePerQuantity());
 
         final BigDecimal taxCost = this.calculateTaxCost(invoiceRequest.getTax(), costWithoutTax);
 
         final BigDecimal totalCost = this.calculateTotalCost(costWithoutTax, taxCost);
 
-        return this.fromRequestToInvoice(invoiceRequest, costWithoutTax, taxCost, totalCost, invoiceRequest.getTax(), invoiceRequest.getPricePerQuantity());
+        final Invoice invoice = this.fromRequestToInvoice(invoiceRequest, costWithoutTax, taxCost, totalCost, invoiceRequest.getTax(), invoiceRequest.getPricePerQuantity());
+
+        logger.debug("Invoice created successfully for customer: {}", invoiceRequest.getCustomerName());
+
+        return invoice;
     }
 
     private void validateRequest(final InvoiceRequest invoiceRequest) {
+        logger.debug("Validating InvoiceRequest: {}", invoiceRequest);
+
         if (invoiceRequest == null) {
             throw new IllegalArgumentException("Invoice request cannot be null.");
         }
@@ -37,6 +48,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private void validateNonNullFields(final InvoiceRequest invoiceRequest) {
+        logger.debug("Validating non-null fields in InvoiceRequest: {}", invoiceRequest);
+
         if (invoiceRequest.getPricePerQuantity() == null ||
                 invoiceRequest.getTax() == null ||
                 invoiceRequest.getDescription() == null ||
@@ -47,6 +60,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private void validateQuantity(final Integer quantity) {
+        logger.debug("Validating quantity: {}", quantity);
+
         if (quantity == null || quantity < 1) {
             throw new IllegalArgumentException("Quantity must be greater than 0.");
         }

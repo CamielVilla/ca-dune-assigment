@@ -1,4 +1,4 @@
-package com.camielvr.duneassignment.domain;
+package com.camielvr.duneassignment.domain.requests;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -13,11 +13,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrderSpiceRequest {
+public class SpiceOrderRequest {
     @NonNull @NotBlank
     private String customerName;
     @NotNull @Min(1)
-    private Integer spiceQuantity;
-    @NonNull
-    private LocalDateTime orderDate;
+    private Integer quantity;
 }

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spice Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Spice Orders</h1>
+
+    <h2>Place a Spice Order</h2>
+    <form id="orderForm">
+        <label for="customerName">Select Customer:</label>
+        <select id="customerName" name="customerName" required>
+            <option value="">Select a customer</option>
+        </select>
+        <br><br>
+        <label for="quantity">Quantity in kg:</label>
+        <input type="number" id="quantity" name="quantity" required>
+        <br><br>
+        <button type="submit">Place Order</button>
+    </form>
+
+    <h2>All Spice Orders</h2>
+    <table id="ordersTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Quantity</th>
+                <th>Customer</th>
+                <th>Invoice</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+
+        function fetchCustomers() {
+            fetch('spices/orders/customers')
+                .then(response => response.json())
+                .then(customers => {
+                    const customerSelect = document.getElementById('customerName');
+                    customerSelect.innerHTML = '<option value="">Select a customer</option>';
+
+                    if (Array.isArray(customers)) {
+                        customers.forEach(customer => {
+                            const option = document.createElement('option');
+                            option.innerText = customer;
+                            customerSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Unexpected data format:', customers);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching customers:', error);
+                });
+        }
+
+
+
+        function fetchSpiceOrders() {
+            fetch('/spices/orders')
+                .then(response => response.json())
+                .then(data => {
+                    const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
+                    ordersTable.innerHTML = ''; // Clear existing rows
+                    data.forEach(order => {
+                        const row = ordersTable.insertRow();
+                        row.insertCell(0).innerText = order.id;
+                        row.insertCell(1).innerText = order.quantity;
+                        row.insertCell(2).innerText = order.customerName;
+                        const invoiceCell = row.insertCell(3);
+                        const invoiceButton = document.createElement('button');
+                        invoiceButton.innerText = 'Get Invoice';
+                        invoiceButton.onclick = () => fetchInvoice(order.id);
+                        invoiceCell.appendChild(invoiceButton);
+                    });
+                });
+        }
+
+        function fetchInvoice(id) {
+            fetch(`spices/orders/${id}/invoice`)
+                .then(response => response.json())
+                .then(invoice => {
+                    alert(`Invoice for order ${invoice.id}: \n
+                    Customer: ${invoice.customerName} \n
+                    Quantity: ${invoice.quantity} \n
+                    Price per kg: ${invoice.pricePerKilogram} \n
+                    Price without tax: ${invoice.costWithoutTax} \n
+                    Tax: ${invoice.tax} % \n
+                    Tax price: ${invoice.taxCost} \n
+                    Total Price: ${invoice.totalCost}
+                    `);
+                });
+        }
+
+
+
+        // Place a new spice order
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+
+            const data = {
+                customerName: formData.get('customerName'), // Naam van de klant uit de dropdown
+                quantity: formData.get('quantity') // Aantal kilo's uit het inputveld
+            };
+
+            fetch('/spices/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data) // Verstuur de gegevens als JSON
+            })
+                .then(response => {
+                    if (response.status === 201) {
+                        alert('Order placed successfully');
+                        fetchSpiceOrders();
+                        document.getElementById('orderForm').reset();
+                    } else {
+                        alert('Error placing order');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error placing order');
+                });
+        });
+
+
+        window.onload = fetchCustomers;
+    </script>
+</body>
+</html>

@@ -13,11 +13,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("spices/orders")
-public class SpiceController {
+public class SpiceOrderController {
 
     private final SpiceOrderService spiceOrderService;
 
-    public SpiceController(SpiceOrderService spiceOrderService) {
+    public SpiceOrderController(SpiceOrderService spiceOrderService) {
         this.spiceOrderService = spiceOrderService;
     }
 

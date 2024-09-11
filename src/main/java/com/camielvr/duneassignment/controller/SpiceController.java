@@ -3,7 +3,7 @@ package com.camielvr.duneassignment.controller;
 import com.camielvr.duneassignment.domain.dto.InvoiceDTO;
 import com.camielvr.duneassignment.domain.dto.SpiceOrderDTO;
 import com.camielvr.duneassignment.domain.requests.SpiceOrderRequest;
-import com.camielvr.duneassignment.service.SpiceService;
+import com.camielvr.duneassignment.service.SpiceOrderService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,31 +15,31 @@ import java.util.List;
 @RequestMapping("spices/orders")
 public class SpiceController {
 
-    private final SpiceService spiceService;
+    private final SpiceOrderService spiceOrderService;
 
-    public SpiceController(SpiceService spiceService) {
-        this.spiceService = spiceService;
+    public SpiceController(SpiceOrderService spiceOrderService) {
+        this.spiceOrderService = spiceOrderService;
     }
 
     @PostMapping
     public ResponseEntity<Void> orderSpice(@Valid @RequestBody final SpiceOrderRequest spiceOrderRequest) {
-        spiceService.orderSpice(spiceOrderRequest);
+        spiceOrderService.orderSpice(spiceOrderRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
     public ResponseEntity<List<SpiceOrderDTO>> getSpiceOrders() {
-        return ResponseEntity.ok(spiceService.getAllSpiceOrders());
+        return ResponseEntity.ok(spiceOrderService.getAllSpiceOrders());
     }
 
     @GetMapping("/{id}/invoice")
     public ResponseEntity<InvoiceDTO> getSpiceOrderInvoiceById(@PathVariable("id") final Long id) {
-        return ResponseEntity.ok(spiceService.getSpiceOrderInvoice(id));
+        return ResponseEntity.ok(spiceOrderService.getSpiceOrderInvoice(id));
     }
 
     @GetMapping("/customers")
     public ResponseEntity<List<String>> getCustomers() {
-        return ResponseEntity.ok(spiceService.getAllSpiceCustomers());
+        return ResponseEntity.ok(spiceOrderService.getAllSpiceCustomers());
     }
 
 }

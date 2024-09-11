@@ -6,7 +6,7 @@ import com.camielvr.duneassignment.domain.requests.SpiceOrderRequest;
 
 import java.util.List;
 
-public interface SpiceService {
+public interface SpiceOrderService {
 
     void orderSpice(final SpiceOrderRequest spiceOrderRequest);
 

@@ -16,15 +16,41 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Invoice createInvoice(final InvoiceRequest invoiceRequest) {
+        this.validateRequest(invoiceRequest);
+
         final BigDecimal costWithoutTax = this.calculateCostWithoutTax(invoiceRequest.getQuantity(), invoiceRequest.getPricePerQuantity());
 
         final BigDecimal taxCost = this.calculateTaxCost(invoiceRequest.getTax(), costWithoutTax);
 
         final BigDecimal totalCost = this.calculateTotalCost(costWithoutTax, taxCost);
 
-        return this.fromOrderToInvoice(invoiceRequest, costWithoutTax, taxCost, totalCost, invoiceRequest.getTax(), invoiceRequest.getPricePerQuantity());
+        return this.fromRequestToInvoice(invoiceRequest, costWithoutTax, taxCost, totalCost, invoiceRequest.getTax(), invoiceRequest.getPricePerQuantity());
     }
 
+    private void validateRequest(final InvoiceRequest invoiceRequest) {
+        if (invoiceRequest == null) {
+            throw new IllegalArgumentException("Invoice request cannot be null.");
+        }
+
+        validateNonNullFields(invoiceRequest);
+        validateQuantity(invoiceRequest.getQuantity());
+    }
+
+    private void validateNonNullFields(final InvoiceRequest invoiceRequest) {
+        if (invoiceRequest.getPricePerQuantity() == null ||
+                invoiceRequest.getTax() == null ||
+                invoiceRequest.getDescription() == null ||
+                invoiceRequest.getCustomerName() == null ||
+                invoiceRequest.getQuantityType() == null) {
+            throw new IllegalArgumentException("Required fields cannot be null.");
+        }
+    }
+
+    private void validateQuantity(final Integer quantity) {
+        if (quantity == null || quantity < 1) {
+            throw new IllegalArgumentException("Quantity must be greater than 0.");
+        }
+    }
     private BigDecimal calculateTotalCost(BigDecimal costWithoutTax, BigDecimal taxCost) {
         return costWithoutTax.add(taxCost);
     }
@@ -38,12 +64,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         return currentPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
-    private Invoice fromOrderToInvoice(final InvoiceRequest invoiceRequest, final BigDecimal costWithoutTax, final BigDecimal taxCost, final BigDecimal totalCost, final BigDecimal currentTax, final BigDecimal currentPrice) {
+    private Invoice fromRequestToInvoice(final InvoiceRequest invoiceRequest, final BigDecimal costWithoutTax, final BigDecimal taxCost, final BigDecimal totalCost, final BigDecimal currentTax, final BigDecimal currentPrice) {
         return Invoice.builder()
                 .description(invoiceRequest.getDescription())
                 .customerName(invoiceRequest.getCustomerName())
                 .quantity(invoiceRequest.getQuantity())
-                .pricePerKilogram(currentPrice)
+                .quantityType(invoiceRequest.getQuantityType())
+                .pricePerQuantity(currentPrice)
                 .costWithoutTax(costWithoutTax)
                 .tax(currentTax)
                 .taxCost(taxCost)

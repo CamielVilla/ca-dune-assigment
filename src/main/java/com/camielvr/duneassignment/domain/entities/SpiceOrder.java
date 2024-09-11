@@ -22,4 +22,6 @@ public class SpiceOrder {
     private Invoice invoice;
     @Builder.Default
     private String description = "Spice";
+    @Builder.Default
+    private String quantityType = "Kg";
 }

@@ -10,7 +10,7 @@ import com.camielvr.duneassignment.domain.requests.SpiceOrderRequest;
 import com.camielvr.duneassignment.exception.ResourceNotFoundException;
 import com.camielvr.duneassignment.repository.SpiceOrderRepository;
 import com.camielvr.duneassignment.service.InvoiceService;
-import com.camielvr.duneassignment.service.SpiceService;
+import com.camielvr.duneassignment.service.SpiceOrderService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class SpiceServiceImpl implements SpiceService {
+public class SpiceOrderServiceImpl implements SpiceOrderService {
     private final SpiceOrderRepository spiceOrderRepository;
     private final InvoiceService invoiceService;
     private final AppConfig appConfig;
 
-    public SpiceServiceImpl(SpiceOrderRepository spiceOrderRepository, InvoiceService invoiceService, AppConfig appConfig) {
+    public SpiceOrderServiceImpl(SpiceOrderRepository spiceOrderRepository, InvoiceService invoiceService, AppConfig appConfig) {
         this.spiceOrderRepository = spiceOrderRepository;
         this.invoiceService = invoiceService;
         this.appConfig = appConfig;
@@ -45,10 +45,10 @@ public class SpiceServiceImpl implements SpiceService {
         final Optional<SpiceOrder> spiceOrder = spiceOrderRepository.findById(id);
 
         if (spiceOrder.isEmpty()) {
-            throw new ResourceNotFoundException("spice order not found with id" + id);
+            throw new ResourceNotFoundException("spice order not found with id " + id);
         }
 
-        return toInvoiceDTO(spiceOrder.get().getInvoice());
+        return toInvoiceDTO(spiceOrder.get().getId(), spiceOrder.get().getInvoice());
     }
 
     @Override
@@ -62,12 +62,14 @@ public class SpiceServiceImpl implements SpiceService {
         return appConfig.getCustomers();
     }
 
-    private InvoiceDTO toInvoiceDTO(Invoice invoice) {
+    private InvoiceDTO toInvoiceDTO(final Long orderId, final Invoice invoice) {
         return InvoiceDTO.builder()
                 .invoiceId(invoice.getId())
+                .orderId(orderId)
                 .description(invoice.getDescription())
                 .customerName(invoice.getCustomerName())
-                .pricePerKilogram(invoice.getPricePerKilogram())
+                .pricePerQuantity(invoice.getPricePerQuantity())
+                .quantityType(invoice.getQuantityType())
                 .quantity(invoice.getQuantity())
                 .costWithoutTax(invoice.getCostWithoutTax())
                 .tax(invoice.getTax())
@@ -83,6 +85,7 @@ public class SpiceServiceImpl implements SpiceService {
                 .tax(appConfig.getPadishahTax())
                 .quantity(spiceOrder.getQuantity())
                 .description(spiceOrder.getDescription())
+                .quantityType(spiceOrder.getQuantityType())
                 .build();
     }
 

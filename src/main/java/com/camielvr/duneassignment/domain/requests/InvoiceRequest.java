@@ -13,6 +13,7 @@ public class InvoiceRequest {
     private String customerName;
     private BigDecimal pricePerQuantity;
     private Integer quantity;
+    private String quantityType;
     private BigDecimal tax;
     private String description;
 }

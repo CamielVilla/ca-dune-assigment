@@ -16,7 +16,8 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String customerName;
-    private BigDecimal pricePerKilogram;
+    private BigDecimal pricePerQuantity;
+    private String quantityType;
     private Integer quantity;
     private BigDecimal costWithoutTax;
     private BigDecimal tax;

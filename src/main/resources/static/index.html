@@ -106,10 +106,11 @@
             fetch(`spices/orders/${id}/invoice`)
                 .then(response => response.json())
                 .then(invoice => {
-                    alert(`Invoice for order ${invoice.id}: \n
+                    alert(`Invoice for order ${invoice.orderId}: \n
+                    Invoice id: ${invoice.invoiceId} \n
                     Customer: ${invoice.customerName} \n
                     Quantity: ${invoice.quantity} \n
-                    Price per kg: ${invoice.pricePerKilogram} \n
+                    Price per ${invoice.quantityType}: ${invoice.pricePerQuantity} \n
                     Price without tax: ${invoice.costWithoutTax} \n
                     Tax: ${invoice.tax} % \n
                     Tax price: ${invoice.taxCost} \n

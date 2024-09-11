@@ -11,8 +11,10 @@ import java.math.BigDecimal;
 @Getter
 public class InvoiceDTO {
     private Long invoiceId;
+    private Long orderId;
     private String customerName;
-    private BigDecimal pricePerKilogram;
+    private BigDecimal pricePerQuantity;
+    private String quantityType;
     private Integer quantity;
     private BigDecimal costWithoutTax;
     private BigDecimal tax;

@@ -11,4 +11,6 @@ From there, you can:
 - See previous Spice orders.
 - View invoices of previous Spice orders.
 
+Does the tax, price for spice or customers change? Just change them in the config.properties.
+
 Have fun!
